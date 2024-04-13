@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ category.name }} Subcategories</title>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        /* Custom CSS */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #a0ecad; 
+            padding-top: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: auto;
+        }
+        h1 {
+            color: #007bff;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .subcategories {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+        .subcategories a {
+            display: inline-block;
+            margin: 5px;
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+        .item {
+            margin-bottom: 20px;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 5px;
+        }
+        .item img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 5px;
+        }
+        .item h2 {
+            color: #007bff;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+         <!-- A link to go back to the catalog  -->
+        <a href="{% url 'catalog' %}" class="btn btn-primary" style="margin-top: 10px;">Back to Catalog</a>
+        <h1>{{ category.name }} </h1>
+        <div class="subcategories">
+            <!-- Loop through each subcategory and create a link to its detail page -->
+            {% for subcategory in subcategories %}
+                <a href="{% url 'subcategory_detail' subcategory.id %}" class="btn btn-primary">{{ subcategory.name }}</a>
+            {% endfor %}
+        </div>
+
+        <div id="items-container">
+            <!-- Search form -->
+            <form id="search-form" action="{% url 'items_search' %}" method="GET">
+                <div class="form-group">
+                    <input type="text" name="query" class="form-control" placeholder="Search items">
+                </div>
+                <button type="submit" class="btn btn-primary">Search</button>
+            </form>
+
+            <h1>{{ subcategory.name }}</h1>
+            <!-- Loop through each item in the items list -->
+            {% for item in items %}
+            <div class="item">
+                <img src="{{ item.image.url }}" alt="{{ item.name }}">
+                <h2>{{ item.name }}</h2>
+                <p>{{ item.description }}</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Bootstrap JS (Optional) -->
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>

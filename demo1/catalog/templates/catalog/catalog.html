@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ category.name }} Subcategories</title>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        /* Style for the whole page */
+        body {
+            background-color: #a0ecad;
+            margin: 0; /* Remove default margin */
+            padding: 0; /* Remove default padding */
+        }
+
+       
+
+        /* Style for the categories container */
+        #categories-container {
+            position: fixed;
+            top: 50px; 
+            left: 100px; 
+        }
+
+        /* Style for the buttons container */
+        #buttons-container {
+            position: fixed;
+            bottom: 20px; 
+            left: 100px; 
+        }
+
+        /* Style for the buttons */
+        .action-btn {
+            cursor: pointer;
+            background-color: #007bff;
+            color: #fff;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            margin-right: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    
+
+    <!-- Categories -->
+    <div id="categories-container">
+        <h2>Categories</h2>
+        <div id="products-box">
+            {% for category in categories %}
+                <a href="{% url 'category_detail' category.id %}" class="category-link action-btn">{{ category.name }}</a>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Buttons -->
+    <div id="buttons-container">
+        <!-- Register Button -->
+        <a href="{% url 'register' %}" class="btn btn-primary action-btn">Register</a>
+
+        <!-- Login/Logout Button -->
+        {% if user.is_authenticated %}
+            <a href="{% url 'logout' %}" class="btn btn-primary action-btn">Logout</a>
+        {% else %}
+            <a href="{% url 'login' %}" class="btn btn-primary action-btn">Login</a>
+        {% endif %}
+
+        <!-- Profile Button (If User is Logged In) -->
+        {% if user.is_authenticated %}
+            <a href="{% url 'profile' %}" class="btn btn-primary action-btn">Profile</a>
+        {% endif %}
+    </div>
+
+    <!-- Bootstrap JS (Optional) -->
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

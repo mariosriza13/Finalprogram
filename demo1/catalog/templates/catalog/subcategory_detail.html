@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ subcategory.name }} Items</title>
+    <!-- Link Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            background-color: #a0ecad; /* Light green background color */
+        }
+        .item-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .item-info {
+            display: flex;
+            flex-direction: column; /* Display item name and description vertically */
+        }
+        .item-name {
+            margin-bottom: 5px; /* Add some space between name and description */
+            font-size: 18px;
+            font-weight: bold;
+        }
+        .item-description {
+            font-size: 14px; /* Adjust font size for description */
+        }
+        .item-image {
+            width: 100px;
+            height: auto;
+        }
+        .btn-group {
+            display: flex;
+            align-items: center;
+        }
+        .btn-group .btn {
+            margin-left: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="{% url 'category_detail' 1 %}" class="btn btn-primary" style="margin-top: 10px;">Go to Categories</a>
+         <!-- Display the subcategory and the word 'Products' -->
+        <h1>{{ subcategory.name }} Products</h1>
+        {% if user.is_authenticated %}
+        <p>Welcome, {{ user.username }}!</p>
+        {% else %}
+        <p>Please <a href="{% url 'login' %}">log in</a> to like or dislike items.</p>
+        {% endif %}
+        <!-- Item search form -->
+        <form id="search-form" action="{% url 'items_search' %}" method="GET" class="mb-3">
+            <div class="input-group">
+                <input type="text" name="query" class="form-control" placeholder="Search items">
+                <div class="input-group-append">
+                    <button type="submit" class="btn btn-primary">Search</button>
+                </div>
+            </div>
+            {% csrf_token %}
+        </form>
+
+        <!-- Item list and loop through each item -->
+        {% for item in items %}
+        <div class="item-container">
+            <!-- item information -->
+            <div class="item-info">
+                <div class="item-name">{{ item.name }}</div>
+                <div class="item-description">{{ item.description }}</div> <!-- Add item description -->
+            </div>
+            <img src="{{ item.image.url }}" alt="" class="item-image">
+            <div class="btn-group">
+                <!-- Container for like and dislike buttons -->
+                {% if item.liked_by_user %}
+                <!-- check  if item is liked -->
+                <button type="button" class="btn btn-primary like-btn" data-item-id="{{ item.id }}" style="display: none;">Like</button>
+                <button type="button" class="btn btn-danger dislike-btn" data-item-id="{{ item.id }}">Dislike</button>
+                {% else %}
+                <!--if item is liked show dislke button if it is not liked show like button-->
+                <button type="button" class="btn btn-primary like-btn" data-item-id="{{ item.id }}">Like</button>
+                <button type="button" class="btn btn-danger dislike-btn" data-item-id="{{ item.id }}" style="display: none;">Dislike</button>
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Include jQuery library -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <!-- Include Bootstrap JS -->
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+    <script>
+        $(document).ready(function() {
+            // Function to get the CSRF token from the cookie
+            function getCSRFToken() {
+                var csrfCookie = document.cookie.match(/csrftoken=([\w-]+)/);
+                return csrfCookie ? csrfCookie[1] : null;
+            }
+    
+            // Attach event listener to like buttons
+            $('.like-btn').click(function() {
+                console.log("Like button clicked");
+                var itemId = $(this).data('item-id');
+                var likeButton = $(this);
+                var dislikeButton = $(this).siblings('.dislike-btn');
+    
+                // Construct the URL for liking the item
+                var likeUrl = '/like/' + itemId + '/';
+    
+                // Get CSRF token
+                var csrfToken = getCSRFToken();
+    
+                // Send POST request to like the item with CSRF token
+                $.ajax({
+                    url: likeUrl,
+                    type: 'POST',
+                    headers: {
+                        'X-CSRFToken': csrfToken
+                    },
+                    
+                    success: function(data) {
+                        if (data.success) {
+                            likeButton.addClass('d-none');
+                            dislikeButton.removeClass('d-none')
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.error(xhr.responseText);
+                    }
+                });
+            });
+    
+            // Attach event listener to dislike buttons
+            $('.dislike-btn').click(function() {
+                var itemId = $(this).data('item-id');
+                var likeButton = $(this).siblings('.like-btn');
+                var dislikeButton = $(this);
+    
+                // Construct the URL for disliking the item
+                var dislikeUrl = '/dislike/' + itemId + '/';
+    
+                // Get CSRF token
+                var csrfToken = getCSRFToken();
+    
+                // Send POST request to dislike the item with CSRF token
+                $.ajax({
+                    url: dislikeUrl,
+                    type: 'POST',
+                    headers: {
+                        'X-CSRFToken': csrfToken
+                    },
+                    success: function(data) {
+                        if (data.success) {
+                            likeButton.removeClass('d-none');
+                            dislikeButton.addClass('d-none');
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.error(xhr.responseText);
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
